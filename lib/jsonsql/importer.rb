@@ -57,7 +57,7 @@ module Jsonsql
         if class_supported?(clazz)
           columns[name] = value.class
         else
-          raise ArgumentError, "#{name} is a #{clazz}, not a supported class. Only following classes are supported: #{SEQUEL_SUPPORTED_CLASSES}"
+          columns[name] = String
         end
       end
       columns

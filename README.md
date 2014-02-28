@@ -1,6 +1,6 @@
 # Jsonsql
 
-TODO: Write a gem description
+Allows you to easily execute SQL against and experiment group of JSON files.
 
 ## Installation
 
@@ -18,7 +18,21 @@ Or install it yourself as:
 
 ## Usage
 
-TODO: Write usage instructions here
+jsonsql assume you have set of JSON files having identical structure. To use it, you supply set of JSON files to jsonsql:
+
+```
+jsonsql data/*.json --save-to=output.sqlite
+```
+
+The JSON will imported to output.sqlite file.
+
+Adding ``--console`` will open a ``pry`` console with the database as ``self``.
+
+```
+jsonsql data/*.json --console --save-to=output.sqlite
+```
+
+If you omit the ``--save-to`` option, the database will be discarded after the command.
 
 ## Contributing
 
