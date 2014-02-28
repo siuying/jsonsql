@@ -2,6 +2,8 @@
 
 Allows you to easily execute SQL against and experiment group of JSON files.
 
+[](https://raw.github.com/siuying/jsonsql/master/jsonsql.gif)
+
 ## Installation
 
 Add this line to your application's Gemfile:
