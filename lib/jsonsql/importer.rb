@@ -8,7 +8,7 @@ module Jsonsql
 
     attr_reader :database, :table, :table_name
 
-    def initialize(json_path, database=Sequel.sqlite, table_name="table")
+    def initialize(json_path, database: Sequel.sqlite, table_name: "table")
       @json_path = json_path
       @table_name = table_name
       @database  = database
