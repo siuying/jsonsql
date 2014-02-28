@@ -1,15 +1,13 @@
 require 'sequel'
 require 'json'
-require 'pry'
 
 module Jsonsql
   class Importer
     SEQUEL_SUPPORTED_CLASSES = [Integer, String, Fixnum, Bignum, Float, BigDecimal, Date, DateTime, Time, Numeric, TrueClass, FalseClass]
 
-    attr_reader :database, :table, :table_name, :json_path
+    attr_reader :database, :table_name
 
-    def initialize(json_path, database: Sequel.sqlite, table_name: "table")
-      @json_path  = json_path
+    def initialize(database: Sequel.sqlite, table_name: "table")
       @table_name = table_name
       @database   = database
       @table_created = false
@@ -19,9 +17,11 @@ module Jsonsql
       @table ||= @database[table_name.to_sym]
     end
 
-    def import
-      Dir["#{json_path}/*.json"].each do |filename|
-        import_jsonfile(filename)
+    def import(files)
+      database.transaction do
+        files.each do |filename|
+          import_jsonfile(filename)
+        end
       end
     end
 

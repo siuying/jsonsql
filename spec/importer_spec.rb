@@ -3,7 +3,7 @@ require 'date'
 require 'sequel'
 
 describe Jsonsql::Importer do
-  subject { Jsonsql::Importer.new("samples/mtr") }
+  subject { Jsonsql::Importer.new }
 
   context "#import_jsonfile" do
     it "import one json file to db" do
@@ -23,15 +23,14 @@ describe Jsonsql::Importer do
   end
 
   context "#import" do
-    it "should import all files on the path" do
-      # 43 files in the sample path
-      expect(subject).to receive(:import_jsonfile).exactly(43).times
+    it "should import all files given" do
+      expect(subject).to receive(:import_jsonfile).exactly(3).times
 
-      subject.import
+      subject.import(["1", "2", "3"])
     end
 
     it "populate database after import" do
-      subject.import
+      subject.import(Dir["samples/mtr/*.json"])
 
       expect(subject.table).to_not be_nil
       expect(subject.table.count).to eq(43)
