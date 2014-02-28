@@ -2,7 +2,7 @@
 
 Allows you to easily execute SQL against and experiment group of JSON files.
 
-[https://raw.github.com/siuying/jsonsql/master/jsonsql.gif](https://raw.github.com/siuying/jsonsql/master/jsonsql.gif)
+![https://raw.github.com/siuying/jsonsql/master/jsonsql.gif](https://raw.github.com/siuying/jsonsql/master/jsonsql.gif)
 
 ## Installation
 
