@@ -6,19 +6,20 @@ module Jsonsql
   class Importer
     SEQUEL_SUPPORTED_CLASSES = [Integer, String, Fixnum, Bignum, Float, BigDecimal, Date, DateTime, Time, Numeric, TrueClass, FalseClass]
 
-    attr_reader :database, :table, :table_name
+    attr_reader :database, :table, :table_name, :json_path
 
     def initialize(json_path, database: Sequel.sqlite, table_name: "table")
-      @json_path = json_path
+      @json_path  = json_path
       @table_name = table_name
-      @database  = database
+      @database   = database
+      @table_created = false
     end
 
     def table
       @table ||= @database[table_name.to_sym]
     end
 
-    def import_path(json_path)
+    def import
       Dir["#{json_path}/*.json"].each do |filename|
         import_jsonfile(filename)
       end
@@ -28,6 +29,24 @@ module Jsonsql
       row = JSON.parse(open(filename).read)
       create_table_if_needed(row)
       table.insert(row)
+    end
+
+    private
+    def class_supported?(clazz)
+      SEQUEL_SUPPORTED_CLASSES.include?(clazz)
+    end
+
+    # create a table using row data, if it has not been created
+    def create_table_if_needed(row)
+      unless @table_created
+        create_columns = columns_with_row(row)
+        database.create_table(table_name.to_sym) do
+          create_columns.each do |name, clazz|
+            column name.to_sym, clazz
+          end
+        end
+        @table_created = true
+      end
     end
 
     # find the columns of a table via a row of data
@@ -44,18 +63,5 @@ module Jsonsql
       columns
     end
 
-    private
-    def class_supported?(clazz)
-      SEQUEL_SUPPORTED_CLASSES.include?(clazz)
-    end
-
-    def create_table_if_needed(row)
-      create_columns = columns_with_row(row)
-      database.create_table(table_name.to_sym) do
-        create_columns.each do |name, clazz|
-          column name.to_sym, clazz
-        end
-      end
-    end
   end
 end
