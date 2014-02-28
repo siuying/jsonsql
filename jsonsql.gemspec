@@ -8,8 +8,8 @@ Gem::Specification.new do |spec|
   spec.version       = Jsonsql::VERSION
   spec.authors       = ["Francis Chong"]
   spec.email         = ["francis@ignition.hk"]
-  spec.summary       = %q{TODO: Write a short summary. Required.}
-  spec.description   = %q{TODO: Write a longer description. Optional.}
+  spec.summary       = %q{Execute SQL against set of JSON files.}
+  spec.description   = %q{Allows you to easily execute SQL against and experiment group of JSON files.}
   spec.homepage      = ""
   spec.license       = "MIT"
 
