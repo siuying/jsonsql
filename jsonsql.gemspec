@@ -10,7 +10,7 @@ Gem::Specification.new do |spec|
   spec.email         = ["francis@ignition.hk"]
   spec.summary       = %q{Execute SQL against set of JSON files.}
   spec.description   = %q{Allows you to easily execute SQL against and experiment group of JSON files.}
-  spec.homepage      = ""
+  spec.homepage      = "https://github.com/siuying/jsonsql"
   spec.license       = "MIT"
 
   spec.files         = `git ls-files`.split($/)
