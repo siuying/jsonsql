@@ -6,6 +6,7 @@ module Jsonsql
 
     def transform(row)
       self.instance_exec(row, &@transformation)
+      row
     end
 
     def self.transformer_with_block(string)
