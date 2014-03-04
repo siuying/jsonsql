@@ -79,7 +79,7 @@ If you omit the ``--save-to`` option, the database will be discarded after the c
 
 ## Contributing
 
-1. Fork it ( http://github.com/<my-github-username>/jsonsql/fork )
+1. Fork it ( https://github.com/siuying/jsonsql/fork )
 2. Create your feature branch (`git checkout -b my-new-feature`)
 3. Commit your changes (`git commit -am 'Add some feature'`)
 4. Push to the branch (`git push origin my-new-feature`)
