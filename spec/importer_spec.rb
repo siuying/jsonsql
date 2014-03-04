@@ -1,12 +1,13 @@
 require 'spec_helpers'
 require 'date'
 require 'sequel'
+require 'pry'
 
 describe Jsonsql::Importer do
   subject { Jsonsql::Importer.new }
 
   context "#import_jsonfile" do
-    it "import one json file to db" do
+    it "import one json Hash file to db" do
       subject.import_jsonfile("samples/mtr/437582112921640960.json")
 
       expect(subject.table).to_not be_nil
@@ -18,7 +19,17 @@ describe Jsonsql::Importer do
         :lang => "zh",
         :reply_to => "kaede19940908"
       }
-      expect(subject.table.where(:id => 437582112921640960).to_a).to eq([expected_row])
+      expect(subject.table.where(:id => 437582112921640960).first).to eq(expected_row)
+    end
+
+    it "import one json Array file to db" do
+      subject.import_jsonfile("samples/appstore/479516143_0.json")
+
+      expect(subject.table).to_not be_nil
+      expect(subject.table.count).to eq(100)
+
+      expected_row = subject.table.where(:"userReviewId" => 953777225).first
+      expect(expected_row[:userReviewId]).to eq("953777225")
     end
   end
 

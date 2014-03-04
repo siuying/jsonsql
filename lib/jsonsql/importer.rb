@@ -5,11 +5,12 @@ module Jsonsql
   class Importer
     SEQUEL_SUPPORTED_CLASSES = [Integer, String, Fixnum, Bignum, Float, BigDecimal, Date, DateTime, Time, Numeric, TrueClass, FalseClass]
 
-    attr_reader :database, :table_name
+    attr_reader :database, :table_name, :transformer
 
-    def initialize(database: Sequel.sqlite, table_name: "table")
+    def initialize(database: Sequel.sqlite, table_name: "table", transformer: nil)
       @table_name = table_name
       @database   = database
+      @transformer = transformer
       @table_created = false
     end
 
@@ -26,14 +27,31 @@ module Jsonsql
     end
 
     def import_jsonfile(filename)
-      row = JSON.parse(open(filename).read)
-      create_table_if_needed(row)
-      table.insert(row)
+      rowOrArrayOfRows = JSON.parse(open(filename).read)
+      if rowOrArrayOfRows.is_a?(Array)
+        rowOrArrayOfRows.each do |row|
+          import_row(row)
+        end
+      elsif rowOrArrayOfRows.is_a?(Hash)
+        import_row(rowOrArrayOfRows)
+      else
+        raise "Cannot import #{filename}, JSON file should contains Array or Hash."
+      end
+    end
+
+    def self.class_supported?(clazz)
+      SEQUEL_SUPPORTED_CLASSES.include?(clazz)
     end
 
     private
-    def class_supported?(clazz)
-      SEQUEL_SUPPORTED_CLASSES.include?(clazz)
+    def import_row(row)
+      row = transformer.transform(row) if transformer
+
+      # filter to only supported fields
+      row = row.select { |k, v| Jsonsql::Importer.class_supported?(v.class) }
+
+      create_table_if_needed(row)
+      table.insert(row)
     end
 
     # create a table using row data, if it has not been created
@@ -54,10 +72,10 @@ module Jsonsql
       columns = {}
       row.each do |name, value|
         clazz = value.class
-        if class_supported?(clazz)
+        if self.class.class_supported?(clazz)
           columns[name] = value.class
         else
-          columns[name] = String
+          $stderr.puts "Class #{clazz} not supported, skipped"
         end
       end
       columns
