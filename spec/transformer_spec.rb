@@ -15,9 +15,9 @@ describe Jsonsql::Transformer do
     end
   end
 
-  context "::transformer_with_block" do
+  context "::transformer_with_string" do
     it "create a transformer with block" do
-      transformer = Jsonsql::Transformer.transformer_with_block "
+      transformer = Jsonsql::Transformer.transformer_with_string "
       Proc.new { |row| row[:name] = row[:name].downcase if row[:name]; row } 
       "
       data = transformer.transform({:name => "Peter", :id => 1})

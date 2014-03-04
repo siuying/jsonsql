@@ -6,6 +6,27 @@ require 'pry'
 describe Jsonsql::Importer do
   subject { Jsonsql::Importer.new }
 
+  context "using transformer" do
+    it "import JSON with transformer" do
+      transformer = Jsonsql::Transformer.transformer_with_string("Proc.new { |row| row['created_at'] = Time.parse(row['created_at']) if row['created_at']; row } ")
+      expect(transformer).to_not be_nil
+
+      subject = Jsonsql::Importer.new(transformer: transformer)
+      subject.import_jsonfile("samples/mtr/437582112921640960.json")
+
+      expect(subject.table).to_not be_nil
+      expect(subject.table.count).to eq(1)
+      expected_row = {
+        :id => 437582112921640960,
+        :text => "@kaede19940908 圖片係港鐵官方的",
+        :created_at => Time.parse("2014-02-23 21:38:00 +0800"),
+        :lang => "zh",
+        :reply_to => "kaede19940908"
+      }
+      expect(subject.table.where(:id => 437582112921640960).first).to eq(expected_row)
+    end
+  end
+
   context "#import_jsonfile" do
     it "import one json Hash file to db" do
       subject.import_jsonfile("samples/mtr/437582112921640960.json")

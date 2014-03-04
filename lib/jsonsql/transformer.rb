@@ -8,7 +8,7 @@ module Jsonsql
       self.instance_exec(row, &@transformation)
     end
 
-    def self.transformer_with_block(string)
+    def self.transformer_with_string(string)
       block = eval(string)
       Transformer.new(&block)
     end
