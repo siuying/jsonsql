@@ -75,7 +75,8 @@ module Jsonsql
         if self.class.class_supported?(clazz)
           columns[name] = value.class
         else
-          $stderr.puts "Class #{clazz} not supported, skipped"
+          columns[name] = String
+          $stderr.puts "Class #{clazz} not supported, assumed as String"
         end
       end
       columns
