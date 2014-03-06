@@ -23,6 +23,7 @@ module Jsonsql
         @jsons << argument
       end
 
+      @verbose = argv.flag?('verbose', false)
       @console = argv.flag?('console', true)
       @filename = argv.option('save-to') || ':memory:'
       @table_name = argv.option('table-name') || 'table'
@@ -38,7 +39,7 @@ module Jsonsql
 
     def run
       sequel = Sequel.sqlite(@filename)
-      importer = Importer.new(database: sequel, table_name: @table_name)
+      importer = Importer.new(database: sequel, table_name: @table_name, verbose: @verbose)
       importer.import @jsons
 
       if @console

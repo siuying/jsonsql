@@ -1,5 +1,6 @@
 require 'sequel'
 require 'json'
+require 'logger'
 
 module Jsonsql
   class Importer
@@ -7,11 +8,12 @@ module Jsonsql
 
     attr_reader :database, :table_name, :transformer
 
-    def initialize(database: Sequel.sqlite, table_name: "table", transformer: nil)
+    def initialize(database: Sequel.sqlite, table_name: "table", transformer: nil, verbose: false)
       @table_name = table_name
       @database   = database
       @transformer = transformer
       @table_created = false
+      @database.loggers << Logger.new($stdout) if verbose
     end
 
     def table
@@ -50,20 +52,31 @@ module Jsonsql
       # filter to only supported fields
       row = row.select { |k, v| Jsonsql::Importer.class_supported?(v.class) }
 
-      create_table_if_needed(row)
+      create_or_alter_table_if_needed(row)
       table.insert(row)
     end
 
-    # create a table using row data, if it has not been created
-    def create_table_if_needed(row)
+    def create_or_alter_table_if_needed(row)
       unless @table_created
-        create_columns = columns_with_row(row)
+        columns = columns_with_row(row)
         database.create_table(table_name.to_sym) do
-          create_columns.each do |name, clazz|
+          columns.each do |name, clazz|
             column name.to_sym, clazz
           end
         end
+        @columns = columns
         @table_created = true
+      else
+        updated_columns = columns_with_row(row)
+        added_keys = updated_columns.keys - @columns.keys
+        if added_keys.count > 0
+          database.alter_table(table_name.to_sym) do
+            added_keys.each do |key|
+              add_column key.to_sym, updated_columns[key], :default => nil
+            end
+          end
+          @columns = updated_columns
+        end
       end
     end
 
@@ -74,9 +87,6 @@ module Jsonsql
         clazz = value.class
         if self.class.class_supported?(clazz)
           columns[name] = value.class
-        else
-          columns[name] = String
-          $stderr.puts "Class #{clazz} not supported, assumed as String"
         end
       end
       columns
